@@ -2,7 +2,6 @@
   <p class="homeText">WELCOME TO ACCOUNT-OWNER APPLICATION</p>
 </template>
 <script>
-import StatusService from "@/api-services/status.service";
 export default {
   name: "Home"
 };

@@ -17,13 +17,26 @@
         </b-row>
         <b-row>
           <b-col>
-            <treeselect
-            v-model= "product.categoryId"
-            :options="categories"
-            :disable-branch-nodes="true"
-            :show-count="true"
-            placeholder="Where are you from?"
-            />
+            <b-form-group id="categoryName" label="Category: " label-for="categoryName">
+              <treeselect
+                v-model="value"
+                :options="categories"
+                :normalizer="normalizer"
+                :disable-branch-nodes="true"
+              />
+            </b-form-group>
+          </b-col>
+          <b-col>
+            <b-form-group id="quantity" label="Quantity: " label-for="quantityBought">
+              <b-form-input
+                id="quantityBought"
+                type="number"
+                v-model="productVersion.quantity"
+                required
+                placeholder="Enter quantity"
+                min="0"
+              />
+            </b-form-group>
           </b-col>
         </b-row>
         <b-row>
@@ -47,6 +60,7 @@
                 v-model="product.latestPrice"
                 required
                 placeholder="Enter price"
+                min="0"
               />
             </b-form-group>
           </b-col>
@@ -81,11 +95,13 @@ export default {
   data() {
     return {
       product: {},
+      productVersion: {},
       // set default value for treeselect
       value: null,
       categories: [],
       normalizer(treeData) {
         return {
+          id: treeData.id,
           label: treeData.categoryName
         };
       },
@@ -125,10 +141,19 @@ export default {
     },
     getallCategories() {
       CategoryService.getAll().then(response => {
+        this.CleanChildrenFromList(response.data);
         this.categories = response.data;
       });
     },
-
+    CleanChildrenFromList(data) {
+      data.forEach(element => {
+        if (element.children.length === 0) {
+          delete element.children;
+        } else {
+          this.CleanChildrenFromList(element.children);
+        }
+      });
+    },
     getAllStatuses() {
       StatusService.getAll().then(response => {
         response.data.forEach(element => {

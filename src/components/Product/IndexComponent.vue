@@ -21,7 +21,6 @@
       id="productTalbe"
       :items="products"
       :fields="fields"
-      responsive
       flex
       :busy="isBusy"
       :filter="filter"
@@ -99,8 +98,16 @@ export default {
       fields: [
         { key: "productName", label: "Product", sortable: true },
         { key: "numberInStock", label: "Stock", sortable: false },
-        { key: "latestePricePerUnit", label: "Latest price", sortable: false },
-        { key: "lowestPricePerUnit", label: "Lowest price", sortable: false },
+        {
+          key: "latestePricePerUnit",
+          label: "Latest price per unit",
+          sortable: false
+        },
+        {
+          key: "lowestPricePerUnit",
+          label: "Lowest price per unit",
+          sortable: false
+        },
         { key: "delete", label: "", class: "columnButton" },
         { key: "edit", label: "", class: "columnButton" }
       ]
