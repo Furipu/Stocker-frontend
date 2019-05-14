@@ -125,9 +125,8 @@ export default {
           this.products = response.data;
           this.toggleBusy();
         })
-        .catch(function(error) {
-          this.toggleBusy();
-          console.log(error.response.data);
+        .catch(function() {
+          this.$router.push({ name: "NotFound" });
         });
     },
     CreateProduct() {

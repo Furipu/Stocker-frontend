@@ -22,7 +22,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"
 import Vuetify from "vuetify"
-import Treeselect from "@riophae/vue-treeselect"
 import "@riophae/vue-treeselect/dist/vue-treeselect.css"
 
 Vue.config.productionTip = false
@@ -36,7 +35,6 @@ Vue.use(Vuelidate)
 Vue.component("vue-bootstrap-typeahead", VueBootstrapTypeahead)
 Vue.component("v-select", vSelect)
 Vue.use(Vuetify)
-Vue.component(Treeselect)
 library.add(faTrashAlt)
 library.add(faEdit)
 library.add(faTimesCircle)

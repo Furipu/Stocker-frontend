@@ -19,7 +19,7 @@
           <b-col>
             <b-form-group id="categoryName" label="Category: " label-for="categoryName">
               <treeselect
-                v-model="value"
+                v-model="category"
                 :options="categories"
                 :normalizer="normalizer"
                 :disable-branch-nodes="true"
@@ -41,7 +41,29 @@
         </b-row>
         <b-row>
           <b-col>
-            <b-form-group id="SatusName" label="Status: " label-for="statusName">
+            <b-form-group id="locationName" label="Location: " label-for="locationName">
+              <treeselect
+                v-model="location"
+                :options="locations"
+                :normalizer="normalizerLocation"
+                :disable-branch-nodes="true"
+              />
+            </b-form-group>
+          </b-col>
+          <b-col>
+            <b-form-group id="BrandName" label="Brand: " label-for="brandName">
+              <b-form-select v-model="brands.id" :options="brands"></b-form-select>
+            </b-form-group>
+          </b-col>
+          <b-col>
+            <b-form-group id="SupplierName" label="Supplier: " label-for="supplierName">
+              <b-form-select v-model="suppliers.id" :options="suppliers"></b-form-select>
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col>
+            <b-form-group id="StatusName" label="Status: " label-for="statusName">
               <b-form-select v-model="statuses.id" :options="statuses"></b-form-select>
             </b-form-group>
           </b-col>
@@ -74,6 +96,37 @@
               <b-form-select v-model="metrics.id" :options="metrics"></b-form-select>
             </b-form-group>
           </b-col>
+          <b-col>
+            <b-form-group id="PricePerUnit" label="Price per unit: " label-for="pricePerUnit">
+              <b-form-input
+                id="pricePerUnit"
+                type="number"
+                v-model="productVersion.pricePerUnit"
+                disabled
+                min="0"
+              />
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <b-row>
+          <b-col>
+            <b-form-group id="DayOfPurchase" label="Day of purchase: " label-for="dayOfPurchase">
+              <b-form-input id="dayOfPurchase" type="date" v-model="productVersion.dayOfPurchase"/>
+            </b-form-group>
+          </b-col>
+          <b-col>
+            <b-form-group
+              id="ExpirationDate"
+              label="Day of expiration: "
+              label-for="expirationDate"
+            >
+              <b-form-input
+                id="expirationDate"
+                type="date"
+                v-model="productVersion.expirationDate"
+              />
+            </b-form-group>
+          </b-col>
         </b-row>
         <b-button type="submit" variant="primary">Save</b-button>
         <b-button type="button" @click="Cancel">Cancel</b-button>
@@ -88,6 +141,9 @@ import StatusService from "@/api-services/status.service";
 import QualityService from "@/api-services/quality.service";
 import MetricService from "@/api-services/metric.service";
 import CategoryService from "@/api-services/category.service";
+import LocationService from "@/api-services/location.service";
+import BrandService from "@/api-services/brand.service";
+import SupplierService from "@/api-services/supplier.service";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 export default {
@@ -97,7 +153,8 @@ export default {
       product: {},
       productVersion: {},
       // set default value for treeselect
-      value: null,
+      category: null,
+      location: null,
       categories: [],
       normalizer(treeData) {
         return {
@@ -105,9 +162,18 @@ export default {
           label: treeData.categoryName
         };
       },
+      normalizerLocation(treeData) {
+        return {
+          id: treeData.id,
+          label: treeData.locationName
+        };
+      },
       statuses: [],
+      brands: [],
+      suppliers: [],
       qualities: [],
-      metrics: []
+      metrics: [],
+      locations: []
     };
   },
   created() {
@@ -117,7 +183,10 @@ export default {
       });
     }
     this.getallCategories();
+    this.getAllLocations();
     this.getAllStatuses();
+    this.getAllBrands();
+    this.getAllSuppliers();
     this.getAllQualities();
     this.getAllMetrics();
   },
@@ -161,6 +230,23 @@ export default {
         });
       });
     },
+    getAllBrands() {
+      BrandService.getAll().then(response => {
+        response.data.forEach(element => {
+          this.brands.push({ value: element.id, text: element.brandName });
+        });
+      });
+    },
+    getAllSuppliers() {
+      SupplierService.getAll().then(response => {
+        response.data.forEach(element => {
+          this.suppliers.push({
+            value: element.id,
+            text: element.supplierName
+          });
+        });
+      });
+    },
     getAllQualities() {
       QualityService.getAll().then(response => {
         response.data.forEach(element => {
@@ -173,6 +259,12 @@ export default {
         response.data.forEach(element => {
           this.metrics.push({ value: element.id, text: element.metricName });
         });
+      });
+    },
+    getAllLocations() {
+      LocationService.getAll().then(response => {
+        this.CleanChildrenFromList(response.data);
+        this.locations = response.data;
       });
     }
   }
