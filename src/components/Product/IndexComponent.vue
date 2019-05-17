@@ -51,6 +51,14 @@
           </b-button>
         </router-link>
       </template>
+      <!------------------------ add ------------------------->
+      <template slot="add" slot-scope="row">
+        <router-link :to="{name: 'product/edit', params: { id: row.item.id }}">
+          <b-button variant="outline-dark" v-b-tooltip.hover title="Add">
+            <font-awesome-icon icon="cart-plus"/>
+          </b-button>
+        </router-link>
+      </template>
       <!----------------------------------------------------->
     </b-table>
     <div
@@ -109,7 +117,8 @@ export default {
           sortable: false
         },
         { key: "delete", label: "", class: "columnButton" },
-        { key: "edit", label: "", class: "columnButton" }
+        { key: "edit", label: "", class: "columnButton" },
+        { key: "add", label: "", class: "columnButton" }
       ]
     };
   },

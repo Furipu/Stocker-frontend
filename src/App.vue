@@ -31,6 +31,7 @@ C#
         <navbar/>
       </b-col>
     </b-row>
+    <br>
     <b-row>
       <b-col>
         <router-view/>

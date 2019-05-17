@@ -17,13 +17,18 @@
         </b-row>
         <b-row>
           <b-col>
-            <b-form-group id="categoryName" label="Category: " label-for="categoryName">
-              <treeselect
-                v-model="category"
-                :options="categories"
-                :normalizer="normalizer"
-                :disable-branch-nodes="true"
-              />
+            <b-form-group id="category.categoryId" label="Category: " label-for="category">
+              <b-input-group>
+                <treeselect
+                  v-model="product.categoryId"
+                  :options="categories"
+                  :normalizer="normalizer"
+                  :disable-branch-nodes="true"
+                />
+                <b-button variant="outline-dark" v-b-tooltip.hover title="Add">
+                  <font-awesome-icon icon="plus"/>
+                </b-button>
+              </b-input-group>
             </b-form-group>
           </b-col>
           <b-col>
@@ -31,7 +36,7 @@
               <b-form-input
                 id="quantityBought"
                 type="number"
-                v-model="productVersion.quantity"
+                v-model="product.quantityInStock"
                 required
                 placeholder="Enter quantity"
                 min="0"
@@ -41,9 +46,9 @@
         </b-row>
         <b-row>
           <b-col>
-            <b-form-group id="locationName" label="Location: " label-for="locationName">
+            <b-form-group id="locationName" label="Location: " label-for="product.location">
               <treeselect
-                v-model="location"
+                v-model="product.locationId"
                 :options="locations"
                 :normalizer="normalizerLocation"
                 :disable-branch-nodes="true"
@@ -51,25 +56,45 @@
             </b-form-group>
           </b-col>
           <b-col>
-            <b-form-group id="BrandName" label="Brand: " label-for="brandName">
-              <b-form-select v-model="brands.id" :options="brands"></b-form-select>
+            <b-form-group id="BrandName" label="Brand: " label-for="product.brand">
+              <b-input-group>
+                <b-form-select v-model="product.brandId" :options="brands"></b-form-select>
+                <b-button variant="outline-secondary" v-b-tooltip.hover title="Add">
+                  <font-awesome-icon icon="plus"/>
+                </b-button>
+              </b-input-group>
             </b-form-group>
           </b-col>
           <b-col>
             <b-form-group id="SupplierName" label="Supplier: " label-for="supplierName">
-              <b-form-select v-model="suppliers.id" :options="suppliers"></b-form-select>
+              <b-input-group>
+                <b-form-select v-model="product.supplierId" :options="suppliers"></b-form-select>
+                <b-button variant="outline-secondary" v-b-tooltip.hover title="Add">
+                  <font-awesome-icon icon="plus"/>
+                </b-button>
+              </b-input-group>
             </b-form-group>
           </b-col>
         </b-row>
         <b-row>
           <b-col>
             <b-form-group id="StatusName" label="Status: " label-for="statusName">
-              <b-form-select v-model="statuses.id" :options="statuses"></b-form-select>
+              <b-input-group>
+              <b-form-select v-model="product.statusId" :options="statuses"></b-form-select>
+               <b-button variant="outline-secondary" v-b-tooltip.hover title="Add">
+                  <font-awesome-icon icon="plus"/>
+                </b-button>
+              </b-input-group>
             </b-form-group>
           </b-col>
           <b-col>
             <b-form-group id="QualityName" label="Quality: " label-for="qualityName">
-              <b-form-select v-model="qualities.id" :options="qualities"></b-form-select>
+              <b-input-group>
+              <b-form-select v-model="product.qualityId" :options="qualities"></b-form-select>
+               <b-button variant="outline-secondary" v-b-tooltip.hover title="Add">
+                  <font-awesome-icon icon="plus"/>
+                </b-button>
+              </b-input-group>
             </b-form-group>
           </b-col>
         </b-row>
@@ -88,12 +113,17 @@
           </b-col>
           <b-col>
             <b-form-group id="MetricName" label="Metric: " label-for="metricName">
-              <b-form-select v-model="metrics.id" :options="metrics"></b-form-select>
+               <b-input-group>
+              <b-form-select v-model="product.metricId" :options="metrics"></b-form-select>
+               <b-button variant="outline-secondary" v-b-tooltip.hover title="Add">
+                  <font-awesome-icon icon="plus"/>
+                </b-button>
+              </b-input-group>
             </b-form-group>
           </b-col>
           <b-col>
             <b-form-group id="DefaultMetricName" label="Default Metric: " label-for="metricName">
-              <b-form-select v-model="metrics.id" :options="metrics"></b-form-select>
+              <b-form-select v-model="product.defaultMetricId" :options="metrics"></b-form-select>
             </b-form-group>
           </b-col>
           <b-col>
@@ -101,7 +131,7 @@
               <b-form-input
                 id="pricePerUnit"
                 type="number"
-                v-model="productVersion.pricePerUnit"
+                v-model="product.latestPricePerUnit"
                 disabled
                 min="0"
               />
@@ -173,6 +203,7 @@ export default {
       suppliers: [],
       qualities: [],
       metrics: [],
+      defaultMetrics: [],
       locations: []
     };
   },
@@ -258,6 +289,10 @@ export default {
       MetricService.getAll().then(response => {
         response.data.forEach(element => {
           this.metrics.push({ value: element.id, text: element.metricName });
+          this.defaultMetrics.push({
+            value: element.id,
+            text: element.metricName
+          });
         });
       });
     },
