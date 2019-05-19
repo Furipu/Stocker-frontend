@@ -13,7 +13,7 @@
       </b-col>
       <b-col>
          <b-button variant="danger" v-b-tooltip.hover title="Delete Product">
-          <font-awesome-icon class="fa-10x" icon="trash-alt"/>
+          <font-awesome-icon class="fa-10x" icon="minus"/>
         </b-button>
       </b-col>
     </b-row>

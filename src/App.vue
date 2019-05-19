@@ -1,34 +1,8 @@
-C#
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
 <template>
   <b-container id="app">
     <b-row>
       <b-col>
-        <navbar/>
+        <navbar :loggedUser="user"/>
       </b-col>
     </b-row>
     <br>
@@ -42,11 +16,41 @@ C#
 
 <script>
 import Navbar from "@/components/Navbar";
-
 export default {
   name: "App",
   components: {
     Navbar
+  },
+
+  // okta login
+  data() {
+    return {
+      user: null
+    };
+  },
+  async created() {
+    await this.refreshUser();
+  },
+  watch: {
+    $route: "onRouteChange"
+  },
+  methods: {
+    login() {
+      this.$auth.loginRedirect();
+    },
+    async onRouteChange() {
+      // every time a route is changed refresh the user details
+      await this.refreshUser();
+    },
+    async refreshUser() {
+      // get new user details and store it to user object
+      this.user = await this.$auth.getUser();
+    },
+    async logout() {
+      await this.$auth.logout();
+      await this.refreshUser();
+      this.$router.push("/");
+    }
   }
 };
 </script>

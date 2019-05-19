@@ -68,7 +68,7 @@
           <b-col>
             <b-form-group id="SupplierName" label="Supplier: " label-for="supplierName">
               <b-input-group>
-                <b-form-select v-model="product.supplierId" :options="suppliers"></b-form-select>
+                <b-form-select v-model="productVersion.supplierId" :options="suppliers"></b-form-select>
                 <b-button variant="outline-secondary" v-b-tooltip.hover title="Add">
                   <font-awesome-icon icon="plus"/>
                 </b-button>
@@ -80,8 +80,12 @@
           <b-col>
             <b-form-group id="StatusName" label="Status: " label-for="statusName">
               <b-input-group>
-              <b-form-select v-model="product.statusId" :options="statuses"></b-form-select>
-               <b-button variant="outline-secondary" v-b-tooltip.hover title="Add">
+                <b-form-select v-model="product.statusId" :options="statuses"></b-form-select>
+                <b-button
+                  variant="outline-secondary"
+                  v-b-tooltip.hover
+                  title="Add"
+                >
                   <font-awesome-icon icon="plus"/>
                 </b-button>
               </b-input-group>
@@ -90,8 +94,8 @@
           <b-col>
             <b-form-group id="QualityName" label="Quality: " label-for="qualityName">
               <b-input-group>
-              <b-form-select v-model="product.qualityId" :options="qualities"></b-form-select>
-               <b-button variant="outline-secondary" v-b-tooltip.hover title="Add">
+                <b-form-select v-model="product.qualityId" :options="qualities"></b-form-select>
+                <b-button variant="outline-secondary" v-b-tooltip.hover title="Add">
                   <font-awesome-icon icon="plus"/>
                 </b-button>
               </b-input-group>
@@ -113,9 +117,9 @@
           </b-col>
           <b-col>
             <b-form-group id="MetricName" label="Metric: " label-for="metricName">
-               <b-input-group>
-              <b-form-select v-model="product.metricId" :options="metrics"></b-form-select>
-               <b-button variant="outline-secondary" v-b-tooltip.hover title="Add">
+              <b-input-group>
+                <b-form-select v-model="product.metricId" :options="metrics"></b-form-select>
+                <b-button variant="outline-secondary" v-b-tooltip.hover title="Add">
                   <font-awesome-icon icon="plus"/>
                 </b-button>
               </b-input-group>
@@ -174,6 +178,7 @@ import CategoryService from "@/api-services/category.service";
 import LocationService from "@/api-services/location.service";
 import BrandService from "@/api-services/brand.service";
 import SupplierService from "@/api-services/supplier.service";
+import ProductVersionService from "@/api-services/productVersion.service";
 import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 export default {
@@ -224,8 +229,16 @@ export default {
   methods: {
     updateProduct() {
       if (this.product.id === undefined || this.product.id === null) {
+        this.productVersion.quantityInStock = this.product.quantityInStock;
+        this.productVersion.quantityPurchased = this.product.quantityInStock;
+        this.productVersion.price = this.product.latestPrice;
+        this.productVersion.pricePerUnit = this.product.latestPricePerUnit;
         ProductService.create(this.product).then(response => {
-          this.$router.push({ name: "products" });
+          this.productVersion.productId = response.data.id;
+          this.productVersion.metricId = response.data.metricId;
+          ProductVersionService.create(this.productVersion).then(response => {
+            this.$router.push({ name: "products" });
+          });
         });
       } else {
         ProductService.update(this.$route.params.id, this.product).then(

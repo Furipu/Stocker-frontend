@@ -90,6 +90,7 @@
 
 <script>
 import StatusService from "@/api-services/status.service";
+import axios from "axios";
 export default {
   data() {
     return {
@@ -103,10 +104,23 @@ export default {
       ]
     };
   },
-
+  async created() {
+    // eslint-disable-next-line
+    axios.defaults.headers.common[
+      "Authorization"
+    ] = `Bearer ${await this.$auth.getAccessToken()}`;
+    try {
+      StatusService.getAll().then(response => {
+        this.statuses = response.data;
+        this.toggleBusy();
+      });
+    } catch (e) {
+      this.$auth.loginRedirect()
+    }
+  },
   mounted() {
     this.toggleBusy();
-    this.getStatuses();
+    // this.getStatuses();
   },
   methods: {
     getStatuses() {

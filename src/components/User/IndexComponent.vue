@@ -1,6 +1,6 @@
 <template>
   <b-container fluid>
-    <h1>Product</h1>
+    <h1>User</h1>
     <b-row>
       <b-col md="6" class="my-1">
         <b-form-group label-cols-sm="3" label="Filter" class="mb-0">
@@ -13,14 +13,15 @@
         </b-form-group>
       </b-col>
       <b-col md="6" class="text-right">
-        <b-button class="btn btn-primary" @click="CreateProduct()">Create Product</b-button>
+        <b-button class="btn btn-primary" @click="CreateUser()">Create User</b-button>
       </b-col>
     </b-row>
 
     <b-table
-      id="productTalbe"
-      :items="products"
+      id="userTalbe"
+      :items="users"
       :fields="fields"
+      responsive
       flex
       :busy="isBusy"
       :filter="filter"
@@ -45,17 +46,9 @@
       </template>
       <!------------------------ edit ------------------------->
       <template slot="edit" slot-scope="row">
-        <router-link :to="{name: 'product/edit', params: { id: row.item.id }}">
+        <router-link :to="{name: 'user/edit', params: { id: row.item.id }}">
           <b-button variant="outline-dark" v-b-tooltip.hover title="Edit">
             <font-awesome-icon icon="edit"/>
-          </b-button>
-        </router-link>
-      </template>
-      <!------------------------ add ------------------------->
-      <template slot="add" slot-scope="row">
-        <router-link :to="{name: 'product/edit', params: { id: row.item.id }}">
-          <b-button variant="outline-dark" v-b-tooltip.hover title="Add">
-            <font-awesome-icon icon="cart-plus"/>
           </b-button>
         </router-link>
       </template>
@@ -96,56 +89,42 @@
 </template>
 
 <script>
-import ProductService from "@/api-services/product.service";
-import axios from "axios";
+import UserService from "@/api-services/user.service";
 export default {
   data() {
     return {
-      products: [],
+      users: [],
       filter: null,
       isBusy: false,
       fields: [
-        { key: "productName", label: "Product", sortable: true },
-        { key: "numberInStock", label: "Stock", sortable: false },
-        {
-          key: "latestePricePerUnit",
-          label: "Latest price per unit",
-          sortable: false
-        },
-        {
-          key: "lowestPricePerUnit",
-          label: "Lowest price per unit",
-          sortable: false
-        },
+        { key: "firstName", label: "First Name", sortable: true },
+        { key: "lastName", label: "Last Name", sortable: true },
+        { key: "email", label: "Email", sortable: true },
         { key: "delete", label: "", class: "columnButton" },
-        { key: "edit", label: "", class: "columnButton" },
-        { key: "add", label: "", class: "columnButton" }
+        { key: "edit", label: "", class: "columnButton" }
       ]
     };
   },
   async created() {
-    this.getProducts();
+    this.getUsers();
   },
   mounted() {
     this.toggleBusy();
   },
   methods: {
-    async getProducts() {
-      // eslint-disable-next-line
-      axios.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${await this.$auth.getAccessToken()}`;
-      try {
-        ProductService.getAll().then(response => {
-          this.products = response.data;
+    getUsers() {
+      UserService.getAll()
+        .then(response => {
+          this.users = response.data;
           this.toggleBusy();
+        })
+        .catch(function(error) {
+          this.toggleBusy();
+          console.log(error.response.data);
         });
-      } catch (e) {
-        this.$auth.loginRedirect();
-      }
     },
-    CreateProduct() {
-      this.$router.push({ name: "product/create" });
+    CreateUser() {
+      this.$router.push({ name: "user/create" });
     },
     onFiltered(filteredItems) {
       // Trigger pagination to update the number of buttons/pages due to filtering
@@ -154,8 +133,8 @@ export default {
     },
     Delete(id) {
       this.toggleBusy();
-      ProductService.delete(id).then(response => {
-        this.getProducts();
+      UserService.delete(id).then(response => {
+        this.getUsers();
       });
     },
     SetIdForDelete(id) {

@@ -2,6 +2,7 @@ import Vue from "vue"
 import Router from "vue-router"
 import Home from "@/components/Home"
 import NotFound from "@/components/error-pages/NotFound"
+import Auth from "@okta/okta-vue"
 
 import ProductIndexComponent from "@/components/Product/IndexComponent.vue"
 import ProductAddEditComponent from "@/components/Product/AddEditComponent.vue"
@@ -31,15 +32,28 @@ import CountryAddEditComponent from "@/components/Country/AddEditComponent.vue"
 import MetricIndexComponent from "@/components/Metric/IndexComponent.vue"
 import MetricAddEditComponent from "@/components/Metric/AddEditComponent.vue"
 
-Vue.use(Router)
+import UserIndexComponent from "@/components/User/IndexComponent.vue"
+import UserAddEditComponent from "@/components/User/AddEditComponent.vue"
 
-export default new Router({
+Vue.use(Router)
+Vue.use(Auth, {
+  issuer: "https://dev-674202.okta.com/oauth2/default",
+  client_id: "0oam0g76aDg8pNhIH356",
+  redirect_uri: "http://localhost:8080/implicit/callback",
+  scope: "openid profile email"
+})
+
+let router = new Router({
   mode: "history",
   routes: [
+    { path: "/implicit/callback", component: Auth.handleCallback() },
     {
       path: "/",
       name: "Home",
-      component: Home
+      component: Home,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       path: "*",
@@ -49,172 +63,310 @@ export default new Router({
     {
       name: "product/create",
       path: "/product/create",
-      component: ProductAddEditComponent
+      component: ProductAddEditComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "product/edit",
       path: "/product/edit/{id}",
-      component: ProductAddEditComponent
+      component: ProductAddEditComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "products",
       path: "/products",
-      component: ProductIndexComponent
+      component: ProductIndexComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "edit",
       path: "/edit/:id",
-      component: ProductAddEditComponent
+      component: ProductAddEditComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "status/create",
       path: "/status/create",
-      component: StatusAddEditComponent
+      component: StatusAddEditComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "statuses",
       path: "/statuses",
-      component: StatusIndexComponent
+      component: StatusIndexComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "status/update",
       path: "/status/update/{id}",
-      component: StatusIndexComponent
+      component: StatusIndexComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "status/edit",
       path: "/status/edit/{id}",
-      component: StatusAddEditComponent
+      component: StatusAddEditComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "postcities",
       path: "/postcities",
-      component: PostcityIndexComponent
+      component: PostcityIndexComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "postcity/create",
       path: "/postcity/create",
-      component: PostcityAddEditComponent
+      component: PostcityAddEditComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "postcity/update",
       path: "/postcity/update/{id}",
-      component: PostcityAddEditComponent
+      component: PostcityAddEditComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "postcity/edit",
       path: "/postcity/edit/{id}",
-      component: PostcityAddEditComponent
+      component: PostcityAddEditComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "brand/create",
       path: "/brand/create",
-      component: BrandAddEditComponent
+      component: BrandAddEditComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "brands",
       path: "/brands",
-      component: BrandIndexComponent
+      component: BrandIndexComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "brand/update",
       path: "/brand/update/{id}",
-      component: BrandIndexComponent
+      component: BrandIndexComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "brand/edit",
       path: "/brand/edit/{id}",
-      component: BrandAddEditComponent
+      component: BrandAddEditComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "supplier/create",
       path: "/supplier/create",
-      component: SupplierAddEditComponent
+      component: SupplierAddEditComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "suppliers",
       path: "/suppliers",
-      component: SupplierIndexComponent
+      component: SupplierIndexComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "supplier/update",
       path: "/supplier/update/{id}",
-      component: SupplierIndexComponent
+      component: SupplierIndexComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "supplier/edit",
       path: "/supplier/edit/{id}",
-      component: SupplierAddEditComponent
+      component: SupplierAddEditComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "categories",
       path: "/categories",
-      component: CategoryIndexComponent
+      component: CategoryIndexComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "locations",
       path: "/locations",
-      component: LocationIndexComponent
+      component: LocationIndexComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "quality/create",
       path: "/quality/create",
-      component: QualityAddEditComponent
+      component: QualityAddEditComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "qualities",
       path: "/qualities",
-      component: QualityIndexComponent
+      component: QualityIndexComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "quality/update",
       path: "/quality/update/{id}",
-      component: QualityIndexComponent
+      component: QualityIndexComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "quality/edit",
       path: "/quality/edit/{id}",
-      component: QualityAddEditComponent
+      component: QualityAddEditComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "country/create",
       path: "/country/create",
-      component: CountryAddEditComponent
+      component: CountryAddEditComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "countries",
       path: "/countries",
-      component: CountryIndexComponent
+      component: CountryIndexComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "country/update",
       path: "/country/update/{id}",
-      component: CountryIndexComponent
+      component: CountryIndexComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "country/edit",
       path: "/country/edit/{id}",
-      component: CountryAddEditComponent
+      component: CountryAddEditComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "metric/create",
       path: "/metric/create",
-      component: MetricAddEditComponent
+      component: MetricAddEditComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "metrics",
       path: "/metrics",
-      component: MetricIndexComponent
+      component: MetricIndexComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "metric/update",
       path: "/metric/update/{id}",
-      component: MetricIndexComponent
+      component: MetricIndexComponent,
+      meta: {
+        requiresAuth: true
+      }
     },
     {
       name: "metric/edit",
       path: "/metric/edit/{id}",
-      component: MetricAddEditComponent
+      component: MetricAddEditComponent,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      name: "user/create",
+      path: "/user/create",
+      component: UserAddEditComponent,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      name: "users",
+      path: "/users",
+      component: UserIndexComponent,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      name: "user/update",
+      path: "/user/update/{id}",
+      component: UserIndexComponent,
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      name: "user/edit",
+      path: "/user/edit/{id}",
+      component: UserAddEditComponent,
+      meta: {
+        requiresAuth: true
+      }
     }
   ]
 })
+
+router.beforeEach(Vue.prototype.$auth.authRedirectGuard())
+
+export default router
