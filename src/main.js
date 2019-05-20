@@ -26,6 +26,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"
 import Vuetify from "vuetify"
 import "@riophae/vue-treeselect/dist/vue-treeselect.css"
+import ProductState from '@/common/constants'
 
 Vue.config.productionTip = false
 
@@ -46,6 +47,7 @@ library.add(faPlus)
 library.add(faCartPlus)
 library.add(faMinus)
 Vue.component("font-awesome-icon", FontAwesomeIcon)
+Vue.use(ProductState)
 
 /* eslint-disable no-new */
 const store = new Vuex.Store(StoreData)

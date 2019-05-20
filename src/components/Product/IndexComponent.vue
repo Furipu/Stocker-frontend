@@ -51,11 +51,27 @@
           </b-button>
         </router-link>
       </template>
-      <!------------------------ add ------------------------->
-      <template slot="add" slot-scope="row">
+      <!------------------------ addChart ------------------------->
+      <template slot="addCart" slot-scope="row">
         <router-link :to="{name: 'product/edit', params: { id: row.item.id }}">
-          <b-button variant="outline-dark" v-b-tooltip.hover title="Add">
+          <b-button variant="outline-dark" v-b-tooltip.hover title="Add Chart">
             <font-awesome-icon icon="cart-plus"/>
+          </b-button>
+        </router-link>
+      </template>
+      <!------------------------ addStock ------------------------->
+      <template slot="addStock" slot-scope="row">
+        <router-link :to="{name: 'product/edit', params: { id: row.item.id }}">
+          <b-button variant="outline-dark" v-b-tooltip.hover title="Add Stock">
+            <font-awesome-icon icon="plus"/>
+          </b-button>
+        </router-link>
+      </template>
+      <!------------------------ DeleteStock ------------------------->
+      <template slot="DeleteFromStock" slot-scope="row">
+        <router-link :to="{name: 'product/edit', params: { id: row.item.id }}">
+          <b-button variant="outline-dark" v-b-tooltip.hover title="Delete Stock">
+            <font-awesome-icon icon="minus"/>
           </b-button>
         </router-link>
       </template>
@@ -98,6 +114,8 @@
 <script>
 import ProductService from "@/api-services/product.service";
 import axios from "axios";
+import { mapGetters } from "vuex";
+import ProductState from "@/common/constants";
 export default {
   data() {
     return {
@@ -119,12 +137,18 @@ export default {
         },
         { key: "delete", label: "", class: "columnButton" },
         { key: "edit", label: "", class: "columnButton" },
-        { key: "add", label: "", class: "columnButton" }
+
+        { key: "addStock", label: "", class: "columnButton" },
+        { key: "DeleteFromStock", label: "", class: "columnButton" }
       ]
     };
   },
+  computed: {
+    ...mapGetters(["productState"])
+  },
   async created() {
     this.getProducts();
+    this.setTableFields();
   },
   mounted() {
     this.toggleBusy();
@@ -142,6 +166,11 @@ export default {
         });
       } catch (e) {
         this.$auth.loginRedirect();
+      }
+    },
+    setTableFields() {
+      if (this.productState === ProductState.ADD_TO_CHART) {
+        this.fields.push({ key: "addCart", label: "", class: "columnButton" });
       }
     },
     CreateProduct() {

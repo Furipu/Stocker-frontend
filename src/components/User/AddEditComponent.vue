@@ -15,7 +15,7 @@
             </b-form-group>
           </b-col>
         </b-row>
-             <b-row>
+        <b-row>
           <b-col>
             <b-form-group id="lastName" label="Last Name: " label-for="lastName">
               <b-form-input
@@ -28,12 +28,12 @@
             </b-form-group>
           </b-col>
         </b-row>
-             <b-row>
+        <b-row>
           <b-col>
             <b-form-group id="email" label="Email: " label-for="email">
               <b-form-input
                 id="email"
-                type="text"
+                type="email"
                 v-model="user.email"
                 required
                 placeholder="Enter email"
@@ -41,12 +41,12 @@
             </b-form-group>
           </b-col>
         </b-row>
-             <b-row>
+        <b-row>
           <b-col>
             <b-form-group id="login" label="login: " label-for="login">
               <b-form-input
                 id="login"
-                type="text"
+                type="email"
                 v-model="user.login"
                 required
                 placeholder="Enter login"
@@ -83,11 +83,9 @@ export default {
           this.$router.push({ name: "users" });
         });
       } else {
-        UserService.update(this.$route.params.id, this.user).then(
-          response => {
-            this.$router.push({ name: "users" });
-          }
-        );
+        UserService.update(this.$route.params.id, this.user).then(response => {
+          this.$router.push({ name: "users" });
+        });
       }
     },
     Cancel(evt) {
