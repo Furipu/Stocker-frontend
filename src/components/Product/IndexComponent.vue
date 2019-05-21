@@ -134,12 +134,7 @@ export default {
           key: "lowestPricePerUnit",
           label: "Lowest price per unit",
           sortable: false
-        },
-        { key: "delete", label: "", class: "columnButton" },
-        { key: "edit", label: "", class: "columnButton" },
-
-        { key: "addStock", label: "", class: "columnButton" },
-        { key: "DeleteFromStock", label: "", class: "columnButton" }
+        }
       ]
     };
   },
@@ -171,6 +166,20 @@ export default {
     setTableFields() {
       if (this.productState === ProductState.ADD_TO_CHART) {
         this.fields.push({ key: "addCart", label: "", class: "columnButton" });
+      }
+      if (this.productState === ProductState.ADD_TO_STOCK) {
+        this.fields.push({ key: "addStock", label: "", class: "columnButton" });
+      }
+      if (this.productState === ProductState.REMOVE_FROM_STOCK) {
+        this.fields.push({
+          key: "DeleteFromStock",
+          label: "",
+          class: "columnButton"
+        });
+      }
+      if (this.productState === ProductState.DEFAULT) {
+        this.fields.push({ key: "delete", label: "", class: "columnButton" });
+        this.fields.push({ key: "edit", label: "", class: "columnButton" });
       }
     },
     CreateProduct() {
