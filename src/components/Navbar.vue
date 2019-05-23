@@ -72,7 +72,7 @@ export default {
     },
     setProductState() {
       this.$store.commit("setProductState", ProductState.DEFAULT);
-      this.$root.$emit("bv::refresh::table", "productTalbe");
+      this.$root.$emit("bv::refresh::table", "productTable");
     }
   }
 };

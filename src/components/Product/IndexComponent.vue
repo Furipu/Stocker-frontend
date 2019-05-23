@@ -1,6 +1,7 @@
 <template>
   <b-container fluid>
     <h1>Product</h1>
+    <h2>{{productState}}</h2>
     <b-row>
       <b-col md="6" class="my-1">
         <b-form-group label-cols-sm="3" label="Filter" class="mb-0">
@@ -18,7 +19,7 @@
     </b-row>
 
     <b-table
-      id="productTalbe"
+      id="productTable"
       :items="products"
       :fields="fields"
       flex
@@ -30,52 +31,53 @@
         <b-spinner class="align-middle"/>
         <strong>Loading...</strong>
       </div>
-      <!------------------------ delete ------------------------->
-      <template slot="delete" slot-scope="row">
-        <b-button
-          variant="outline-dark"
-          v-b-tooltip.hover
-          title="Delete"
-          data-toggle="modal"
-          data-target="#deleteModal"
-          @click="Delete(row.item.id)"
-        >
-          <font-awesome-icon icon="trash-alt"/>
-        </b-button>
-      </template>
-      <!------------------------ edit ------------------------->
-      <template slot="edit" slot-scope="row">
-        <router-link :to="{name: 'product/edit', params: { id: row.item.id }}">
-          <b-button variant="outline-dark" v-b-tooltip.hover title="Edit">
-            <font-awesome-icon icon="edit"/>
+      <template slot="action" slot-scope="row">
+        <b-button-group>
+          <b-button
+            v-if="productState === 'Default'"
+            variant="outline-dark"
+            v-b-tooltip.hover
+            title="Delete"
+            data-toggle="modal"
+            data-target="#deleteModal"
+            @click="Delete(row.item.id)"
+          >
+            <font-awesome-icon icon="trash-alt"/>
           </b-button>
-        </router-link>
+          <router-link
+            v-if="productState === 'Default'"
+            :to="{name: 'product/edit', params: { id: row.item.id }}"
+          >
+            <b-button variant="outline-dark" v-b-tooltip.hover title="Edit">
+              <font-awesome-icon icon="edit"/>
+            </b-button>
+          </router-link>
+          <router-link
+            v-if="productState === 'AddToChart'"
+            :to="{name: 'product/edit', params: { id: row.item.id }}"
+          >
+            <b-button variant="outline-dark" v-b-tooltip.hover title="Add Chart">
+              <font-awesome-icon icon="cart-plus"/>
+            </b-button>
+          </router-link>
+          <router-link
+            v-if="productState === 'AddToStock'"
+            :to="{name: 'product/edit', params: { id: row.item.id }}"
+          >
+            <b-button variant="outline-dark" v-b-tooltip.hover title="Add Stock">
+              <font-awesome-icon icon="plus"/>
+            </b-button>
+          </router-link>
+          <router-link
+            v-if="productState === 'RemoveFromStock'"
+            :to="{name: 'product/edit', params: { id: row.item.id }}"
+          >
+            <b-button variant="outline-dark" v-b-tooltip.hover title="Delete Stock">
+              <font-awesome-icon icon="minus"/>
+            </b-button>
+          </router-link>
+        </b-button-group>
       </template>
-      <!------------------------ addChart ------------------------->
-      <template slot="addCart" slot-scope="row">
-        <router-link :to="{name: 'product/edit', params: { id: row.item.id }}">
-          <b-button variant="outline-dark" v-b-tooltip.hover title="Add Chart">
-            <font-awesome-icon icon="cart-plus"/>
-          </b-button>
-        </router-link>
-      </template>
-      <!------------------------ addStock ------------------------->
-      <template slot="addStock" slot-scope="row">
-        <router-link :to="{name: 'product/edit', params: { id: row.item.id }}">
-          <b-button variant="outline-dark" v-b-tooltip.hover title="Add Stock">
-            <font-awesome-icon icon="plus"/>
-          </b-button>
-        </router-link>
-      </template>
-      <!------------------------ DeleteStock ------------------------->
-      <template slot="DeleteFromStock" slot-scope="row">
-        <router-link :to="{name: 'product/edit', params: { id: row.item.id }}">
-          <b-button variant="outline-dark" v-b-tooltip.hover title="Delete Stock">
-            <font-awesome-icon icon="minus"/>
-          </b-button>
-        </router-link>
-      </template>
-      <!----------------------------------------------------->
     </b-table>
     <div
       class="modal fade"
@@ -115,7 +117,7 @@
 import ProductService from "@/api-services/product.service";
 import axios from "axios";
 import { mapGetters } from "vuex";
-import ProductState from "@/common/constants";
+// import ProductState from "@/common/constants";
 export default {
   data() {
     return {
@@ -134,7 +136,8 @@ export default {
           key: "lowestPricePerUnit",
           label: "Lowest price per unit",
           sortable: false
-        }
+        },
+        { key: "action", label: "", class: "columnButton" }
       ]
     };
   },
@@ -143,7 +146,6 @@ export default {
   },
   async created() {
     this.getProducts();
-    this.setTableFields();
   },
   mounted() {
     this.toggleBusy();
@@ -163,25 +165,7 @@ export default {
         this.$auth.loginRedirect();
       }
     },
-    setTableFields() {
-      if (this.productState === ProductState.ADD_TO_CHART) {
-        this.fields.push({ key: "addCart", label: "", class: "columnButton" });
-      }
-      if (this.productState === ProductState.ADD_TO_STOCK) {
-        this.fields.push({ key: "addStock", label: "", class: "columnButton" });
-      }
-      if (this.productState === ProductState.REMOVE_FROM_STOCK) {
-        this.fields.push({
-          key: "DeleteFromStock",
-          label: "",
-          class: "columnButton"
-        });
-      }
-      if (this.productState === ProductState.DEFAULT) {
-        this.fields.push({ key: "delete", label: "", class: "columnButton" });
-        this.fields.push({ key: "edit", label: "", class: "columnButton" });
-      }
-    },
+
     CreateProduct() {
       this.$router.push({ name: "product/create" });
     },

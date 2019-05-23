@@ -18,12 +18,25 @@
       </b-col>
     </b-row>
     <br>
+    <b-row>
+      <b-jumbotron header="Shopping Cart">
+        <b-col>
+          <ShoppingCart/>
+        </b-col>
+        <b-col></b-col>
+      </b-jumbotron>
+    </b-row>
+    <br>
   </div>
 </template>
 <script>
-import ProductState from '@/common/constants'
+import ProductState from "@/common/constants";
+import ShoppingCart from "@/components/ShoppingCart";
 export default {
   name: "Home",
+  components: {
+    ShoppingCart
+  },
   methods: {
     AddCart() {
       this.$store.commit("setProductState", ProductState.ADD_TO_CHART);
