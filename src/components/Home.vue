@@ -19,12 +19,10 @@
     </b-row>
     <br>
     <b-row>
-      <b-jumbotron header="Shopping Cart">
-        <b-col>
-          <ShoppingCart/>
-        </b-col>
-        <b-col></b-col>
-      </b-jumbotron>
+      <b-col>
+        <ShoppingCart/>
+      </b-col>
+      <b-col></b-col>
     </b-row>
     <br>
   </div>

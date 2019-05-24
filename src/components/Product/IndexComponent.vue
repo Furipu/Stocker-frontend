@@ -52,14 +52,15 @@
               <font-awesome-icon icon="edit"/>
             </b-button>
           </router-link>
-          <router-link
+          <b-button
             v-if="productState === 'AddToChart'"
-            :to="{name: 'product/edit', params: { id: row.item.id }}"
+            @click="AddToChart(row.item.id)"
+            variant="outline-dark"
+            v-b-tooltip.hover
+            title="Add Chart"
           >
-            <b-button variant="outline-dark" v-b-tooltip.hover title="Add Chart">
-              <font-awesome-icon icon="cart-plus"/>
-            </b-button>
-          </router-link>
+            <font-awesome-icon icon="cart-plus"/>
+          </b-button>
           <router-link
             v-if="productState === 'AddToStock'"
             :to="{name: 'product/edit', params: { id: row.item.id }}"
@@ -115,6 +116,7 @@
 
 <script>
 import ProductService from "@/api-services/product.service";
+import ShopCartService from "@/api-services/shopCart.service";
 import axios from "axios";
 import { mapGetters } from "vuex";
 // import ProductState from "@/common/constants";
@@ -122,6 +124,7 @@ export default {
   data() {
     return {
       products: [],
+      shopCart: {},
       filter: null,
       isBusy: false,
       fields: [
@@ -165,7 +168,16 @@ export default {
         this.$auth.loginRedirect();
       }
     },
-
+    AddToChart(id) {
+      ShopCartService.getByProductId(id)
+        .then(response => {
+          this.shopCart = response.data;
+          console.log(this.shopCart);
+        })
+        .catch(function(error) {
+          console.log(error.response.data);
+        });
+    },
     CreateProduct() {
       this.$router.push({ name: "product/create" });
     },

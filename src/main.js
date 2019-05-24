@@ -21,7 +21,9 @@ import {
   faExclamationCircle,
   faPlus,
   faCartPlus,
-  faMinus
+  faMinus,
+  faCheck,
+  faTimes
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"
 import Vuetify from "vuetify"
@@ -46,6 +48,8 @@ library.add(faExclamationCircle)
 library.add(faPlus)
 library.add(faCartPlus)
 library.add(faMinus)
+library.add(faCheck)
+library.add(faTimes)
 Vue.component("font-awesome-icon", FontAwesomeIcon)
 Vue.use(ProductState)
 

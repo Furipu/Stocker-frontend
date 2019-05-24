@@ -11,6 +11,10 @@ export default {
     return Axios.get(`${RESOURCE_NAME}/${id}`)
   },
 
+  getByProductId(id) {
+    return Axios.get(`${RESOURCE_NAME}/GetShopCartByProductID/${id}`)
+  },
+
   create(data) {
     return Axios.post(RESOURCE_NAME, data)
   },
