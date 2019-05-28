@@ -2,7 +2,8 @@ export default {
   state: {
     adress: {},
     status: "",
-    productState: ""
+    productState: "",
+    product: Object
   },
   getters: {
     adress: state => {
@@ -10,6 +11,9 @@ export default {
     },
     productState: state => {
       return state.productState
+    },
+    product: state => {
+      return state.product
     }
   },
   mutations: {
@@ -21,6 +25,9 @@ export default {
     },
     setProductState(state, newState) {
       state.productState = newState
+    },
+    setProduct(state, product) {
+      state.product = product
     }
   }
 }

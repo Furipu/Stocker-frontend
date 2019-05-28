@@ -1,7 +1,6 @@
 <template>
   <b-container fluid>
     <h1>Product</h1>
-    <h2>{{productState}}</h2>
     <b-row>
       <b-col md="6" class="my-1">
         <b-form-group label-cols-sm="3" label="Filter" class="mb-0">
@@ -31,6 +30,7 @@
         <b-spinner class="align-middle"/>
         <strong>Loading...</strong>
       </div>
+      <!------------------------ buttons ------------------------->
       <template slot="action" slot-scope="row">
         <b-button-group>
           <b-button
@@ -38,8 +38,6 @@
             variant="outline-dark"
             v-b-tooltip.hover
             title="Delete"
-            data-toggle="modal"
-            data-target="#deleteModal"
             @click="Delete(row.item.id)"
           >
             <font-awesome-icon icon="trash-alt"/>
@@ -54,21 +52,25 @@
           </router-link>
           <b-button
             v-if="productState === 'AddToChart'"
-            @click="AddToChart(row.item.id)"
             variant="outline-dark"
+            v-b-modal.modalAddToChart
             v-b-tooltip.hover
+            @click="AddToChart(row.item.id)"
             title="Add Chart"
           >
             <font-awesome-icon icon="cart-plus"/>
           </b-button>
-          <router-link
+          <b-button
             v-if="productState === 'AddToStock'"
-            :to="{name: 'product/edit', params: { id: row.item.id }}"
+            variant="outline-dark"
+            v-b-tooltip.hover
+            v-b-modal.modalAddToStock
+            title="Add Stock"
+            @click="AddToStock(row.item.id)"
           >
-            <b-button variant="outline-dark" v-b-tooltip.hover title="Add Stock">
-              <font-awesome-icon icon="plus"/>
-            </b-button>
-          </router-link>
+            <font-awesome-icon icon="plus"/>
+          </b-button>
+
           <router-link
             v-if="productState === 'RemoveFromStock'"
             :to="{name: 'product/edit', params: { id: row.item.id }}"
@@ -79,54 +81,50 @@
           </router-link>
         </b-button-group>
       </template>
+      <!--------------------------------------------------->
     </b-table>
-    <div
-      class="modal fade"
-      id="deleteModal"
-      tabindex="-1"
-      role="dialog"
-      aria-labelledby="exampleModalCenterTitle"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="col-12 modal-title text-center" id="exampleModalLongTitle">Are you sure?</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body text-center">
-            <font-awesome-icon class="fa-10x fa-spin" style="color: Tomato" icon="times-circle"/>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button
-              type="button"
-              class="btn btn-primary"
-              @click="Delete()"
-              data-dismiss="modal"
-            >Delete</button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <AddToCartModal :shopCartModal="shopCart"/>
+    <AddToStockModal :productModal="product"/>
   </b-container>
 </template>
 
 <script>
 import ProductService from "@/api-services/product.service";
+import AddToCartModal from "@/components/Modal/AddToCartModal";
+import AddToStockModal from "@/components/Modal/AddToStockModal";
 import ShopCartService from "@/api-services/shopCart.service";
 import axios from "axios";
 import { mapGetters } from "vuex";
 // import ProductState from "@/common/constants";
 export default {
+  components: {
+    AddToCartModal,
+    AddToStockModal
+  },
   data() {
     return {
       products: [],
-      shopCart: {},
       filter: null,
       isBusy: false,
+      shopCart: {},
+      product: {
+        category: {
+          categoryName: ""
+        },
+        location: {
+          locationName: ""
+        },
+        brand: {
+          brandName: ""
+        },
+        status: {
+          statusName: ""
+        },
+        quality: {
+          qualityName: ""
+        }
+      },
+      productId: 0,
       fields: [
         { key: "productName", label: "Product", sortable: true },
         { key: "numberInStock", label: "Stock", sortable: false },
@@ -172,11 +170,26 @@ export default {
       ShopCartService.getByProductId(id)
         .then(response => {
           this.shopCart = response.data;
-          console.log(this.shopCart);
         })
-        .catch(function(error) {
-          console.log(error.response.data);
+        .catch(error => {
+          this.makeToastError(error);
         });
+    },
+    AddToStock(id) {
+      ProductService.get(id)
+        .then(response => {
+          this.product = response.data;
+        })
+        .catch(error => {
+          this.makeToastError(error);
+        });
+    },
+    makeToastError(error) {
+      this.$bvToast.toast(`Er is een fout opgetreden :  ${error.response}`, {
+        title: "Error",
+        autoHideDelay: 3000,
+        appendToast: true
+      });
     },
     CreateProduct() {
       this.$router.push({ name: "product/create" });

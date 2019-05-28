@@ -3,17 +3,17 @@
     <b-row>
       <b-col>
         <b-button @click="AddCart()" variant="success" v-b-tooltip.hover title="Add Cart">
-          <font-awesome-icon class="fa-10x" icon="cart-plus"/>
+          <font-awesome-icon class="fa-6x" icon="cart-plus"/>
         </b-button>
       </b-col>
       <b-col>
         <b-button @click="AddStock()" variant="primary" v-b-tooltip.hover title="Add Stock">
-          <font-awesome-icon class="fa-10x" icon="plus"/>
+          <font-awesome-icon class="fa-6x" icon="plus"/>
         </b-button>
       </b-col>
       <b-col>
         <b-button @click="DeleteStock()" variant="danger" v-b-tooltip.hover title="Remove Stock">
-          <font-awesome-icon class="fa-10x" icon="minus"/>
+          <font-awesome-icon class="fa-6x" icon="minus"/>
         </b-button>
       </b-col>
     </b-row>
@@ -62,6 +62,6 @@ export default {
 }
 button {
   width: 300px;
-  height: 200px;
+  height: 100px;
 }
 </style>

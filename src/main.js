@@ -28,7 +28,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome"
 import Vuetify from "vuetify"
 import "@riophae/vue-treeselect/dist/vue-treeselect.css"
-import ProductState from '@/common/constants'
+import ProductState from "@/common/constants"
 
 Vue.config.productionTip = false
 
