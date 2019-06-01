@@ -24,11 +24,15 @@
 
 <script>
 import MetricService from "@/api-services/metric.service";
+import { mapGetters } from "vuex";
 export default {
   data() {
     return {
       metric: {}
     };
+  },
+  computed: {
+    ...mapGetters(["IsMetricFromModal"])
   },
   created() {
     if (this.$route.params.id !== undefined) {
@@ -41,7 +45,11 @@ export default {
     updateMetric() {
       if (this.metric.id === undefined || this.metric.id === null) {
         MetricService.create(this.metric).then(response => {
-          this.$router.push({ name: "metrics" });
+          if (this.IsMetricFromModal) {
+            this.$emit("updateMetricModal");
+          } else {
+            this.$router.push({ name: "metrics" });
+          }
         });
       } else {
         MetricService.update(this.$route.params.id, this.metric).then(

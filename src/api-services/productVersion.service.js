@@ -21,5 +21,15 @@ export default {
 
   delete(id) {
     return Axios.delete(`${RESOURCE_NAME}/${id}`)
+  },
+
+  getDefault(id) {
+    return Axios.get(
+      `${RESOURCE_NAME}/GetDefaultProductVersionByProductId/${id}`
+    )
+  },
+
+  getByProductId(id) {
+    return Axios.get(`${RESOURCE_NAME}/GetProductsVersionsByProductId/${id}`)
   }
 }

@@ -1,5 +1,5 @@
 <template>
-  <b-modal id="modalAddToCart" title="Add To Cart" @ok="handleOk" ref="modal">
+  <b-modal id="modalAddToChart" title="Add To Cart" @ok="handleOk" ref="modal">
     <b-container>
       <b-row align-h="center">
         <b-col cols="4">
@@ -48,7 +48,7 @@ export default {
     };
   },
   props: {
-    shopCartModal: {}
+    shopCartModal: Object
   },
   methods: {
     Add() {

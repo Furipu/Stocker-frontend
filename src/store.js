@@ -3,7 +3,9 @@ export default {
     adress: {},
     status: "",
     productState: "",
-    product: Object
+    product: Object,
+    IsSupplierFromModal: false,
+    IsMetricFromModal: false
   },
   getters: {
     adress: state => {
@@ -14,6 +16,12 @@ export default {
     },
     product: state => {
       return state.product
+    },
+    IsSupplierFromModal: state => {
+      return state.IsSupplierFromModal
+    },
+    IsMetricFromModal: state => {
+      return state.IsMetricFromModal
     }
   },
   mutations: {
@@ -28,6 +36,12 @@ export default {
     },
     setProduct(state, product) {
       state.product = product
+    },
+    setSupplierFromModal(state, stateSupplier) {
+      state.IsSupplierFromModal = stateSupplier
+    },
+    setMetricFromModal(state, stateMetric) {
+      state.IsMetricFromModal = stateMetric
     }
   }
 }

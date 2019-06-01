@@ -60,8 +60,6 @@
 <script>
 import SupplierService from "@/api-services/supplier.service";
 import AdresEditComponent from "@/components/Adress/EditComponent";
-// import { EventBus } from "@/main.js";
-// import { mapState } from "vuex";
 import { mapGetters } from "vuex";
 export default {
   components: {
@@ -73,7 +71,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["adress"])
+    ...mapGetters(["adress", "IsSupplierFromModal"])
   },
   created() {
     if (this.$route.params.id !== undefined) {
@@ -87,7 +85,11 @@ export default {
       this.supplier.adress = this.adress;
       if (this.supplier.id === null || this.supplier.id === undefined) {
         SupplierService.create(this.supplier).then(response => {
-          this.$router.push({ name: "suppliers" });
+          if (this.IsSupplierFromModal) {
+            this.$emit("updateSupplierModal");
+          } else {
+            this.$router.push({ name: "suppliers" });
+          }
         });
       } else {
         SupplierService.update(this.$route.params.id, this.supplier).then(
@@ -99,7 +101,11 @@ export default {
     },
     Cancel(evt) {
       evt.preventDefault();
-      this.$router.push({ name: "suppliers" });
+      if (this.IsSupplierFromModal) {
+        this.$emit("updateSupplierModal");
+      } else {
+        this.$router.push({ name: "suppliers" });
+      }
     }
   }
 };

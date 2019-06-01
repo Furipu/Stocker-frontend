@@ -25,7 +25,7 @@
                   :normalizer="normalizer"
                   :disable-branch-nodes="true"
                 />
-                <b-button variant="outline-dark" v-b-tooltip.hover title="Add">
+                 <b-button variant="outline-dark" v-b-tooltip.hover title="Add">
                   <font-awesome-icon icon="plus"/>
                 </b-button>
               </b-input-group>

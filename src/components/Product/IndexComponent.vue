@@ -13,7 +13,11 @@
         </b-form-group>
       </b-col>
       <b-col md="6" class="text-right">
-        <b-button class="btn btn-primary" @click="CreateProduct()">Create Product</b-button>
+        <b-button
+          v-if="productState === 'Default' || productState === 'AddToStock'"
+          class="btn btn-primary"
+          @click="CreateProduct()"
+        >Create Product</b-button>
       </b-col>
     </b-row>
 
@@ -70,28 +74,32 @@
           >
             <font-awesome-icon icon="plus"/>
           </b-button>
-
-          <router-link
+          <b-button
             v-if="productState === 'RemoveFromStock'"
-            :to="{name: 'product/edit', params: { id: row.item.id }}"
+            variant="outline-dark"
+            v-b-modal.modalRemoveFromStock
+            v-b-tooltip.hover
+            title="Delete Stock"
+            @click="RemoveFromStock(row.item.id)"
           >
-            <b-button variant="outline-dark" v-b-tooltip.hover title="Delete Stock">
-              <font-awesome-icon icon="minus"/>
-            </b-button>
-          </router-link>
+            <font-awesome-icon icon="minus"/>
+          </b-button>
         </b-button-group>
       </template>
       <!--------------------------------------------------->
     </b-table>
     <AddToCartModal :shopCartModal="shopCart"/>
-    <AddToStockModal :productModal="product"/>
+    <AddToStockModal :productVersion="productVersion" v-on:updateProduct="getProducts"/>
+    <RemoveFromStockModal :productVersions="productVersions" v-on:updateProduct="getProducts"/>
   </b-container>
 </template>
 
 <script>
 import ProductService from "@/api-services/product.service";
+import ProductVersionService from "@/api-services/productVersion.service";
 import AddToCartModal from "@/components/Modal/AddToCartModal";
 import AddToStockModal from "@/components/Modal/AddToStockModal";
+import RemoveFromStockModal from "@/components/Modal/RemoveFromStockModal";
 import ShopCartService from "@/api-services/shopCart.service";
 import axios from "axios";
 import { mapGetters } from "vuex";
@@ -99,7 +107,8 @@ import { mapGetters } from "vuex";
 export default {
   components: {
     AddToCartModal,
-    AddToStockModal
+    AddToStockModal,
+    RemoveFromStockModal
   },
   data() {
     return {
@@ -107,27 +116,32 @@ export default {
       filter: null,
       isBusy: false,
       shopCart: {},
-      product: {
-        category: {
-          categoryName: ""
-        },
-        location: {
-          locationName: ""
-        },
-        brand: {
-          brandName: ""
-        },
-        status: {
-          statusName: ""
-        },
-        quality: {
-          qualityName: ""
+      productVersions: [],
+      productVersion: {
+        quantityInStock: 0,
+        product: {
+          productName: "",
+          category: {
+            categoryName: ""
+          },
+          location: {
+            locationName: ""
+          },
+          brand: {
+            brandName: ""
+          },
+          status: {
+            statusName: ""
+          },
+          quality: {
+            qualityName: ""
+          }
         }
       },
       productId: 0,
       fields: [
         { key: "productName", label: "Product", sortable: true },
-        { key: "numberInStock", label: "Stock", sortable: false },
+        { key: "quantityInStock", label: "Stock", sortable: false },
         {
           key: "latestePricePerUnit",
           label: "Latest price per unit",
@@ -160,7 +174,9 @@ export default {
       try {
         ProductService.getAll().then(response => {
           this.products = response.data;
-          this.toggleBusy();
+          if (this.isBusy) {
+            this.toggleBusy();
+          }
         });
       } catch (e) {
         this.$auth.loginRedirect();
@@ -176,22 +192,32 @@ export default {
         });
     },
     AddToStock(id) {
-      ProductService.get(id)
+      ProductVersionService.getDefault(id)
         .then(response => {
-          this.product = response.data;
+          this.productVersion = response.data;
+        })
+        .catch(error => {
+          this.makeToastError(error);
+        });
+    },
+    RemoveFromStock(id) {
+      ProductVersionService.getByProductId(id)
+        .then(response => {
+          this.productVersions = response.data;
         })
         .catch(error => {
           this.makeToastError(error);
         });
     },
     makeToastError(error) {
-      this.$bvToast.toast(`Er is een fout opgetreden :  ${error.response}`, {
+      this.$bvToast.toast(`Er is een fout opgetreden :  ${error}`, {
         title: "Error",
         autoHideDelay: 3000,
         appendToast: true
       });
     },
     CreateProduct() {
+      this.$store.commit("setSupplierFromModal", true);
       this.$router.push({ name: "product/create" });
     },
     onFiltered(filteredItems) {

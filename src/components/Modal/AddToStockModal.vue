@@ -1,7 +1,7 @@
 <template>
   <b-modal id="modalAddToStock" size="xl" title="Add To Stock" @ok="handleOk" ref="modal" lazy>
     <b-container>
-      <b-form @submit.prevent="updateProduct">
+      <b-form ref="form" @submit.stop.prevent="handleSubmit">
         <b-container class="bv-example-row">
           <b-row>
             <b-col>
@@ -9,30 +9,30 @@
                 <b-form-input
                   id="productName"
                   type="text"
-                  v-model="productModal.productName"
+                  v-model="productVersion.product.productName"
                   disabled
                 />
               </b-form-group>
             </b-col>
             <b-col>
               <b-form-group id="StatusName" label="Status: " label-for="statusName">
-                <b-form-input v-model="productModal.status.statusName" disabled/>
+                <b-form-input v-model="productVersion.product.status.statusName" disabled/>
               </b-form-group>
             </b-col>
           </b-row>
           <b-row>
             <b-col>
               <b-form-group
-                id="productModal.category"
+                id="productVersion.product.category"
                 label="Category: "
-                label-for="productModal.category"
+                label-for="productVersion.product.category"
               >
-                <b-form-input v-model="productModal.category.categoryName" disabled/>
+                <b-form-input v-model="productVersion.product.category.categoryName" disabled/>
               </b-form-group>
             </b-col>
             <b-col>
               <b-form-group id="QualityName" label="Quality: " label-for="qualityName">
-                <b-form-input v-model="productModal.quality.qualityName" disabled/>
+                <b-form-input v-model="productVersion.product.quality.qualityName" disabled/>
               </b-form-group>
             </b-col>
           </b-row>
@@ -43,22 +43,26 @@
                 label="Location: "
                 label-for="productVersion.location"
               >
-                <b-form-input v-model="productModal.location.locationName" disabled/>
+                <b-form-input v-model="productVersion.product.location.locationName" disabled/>
               </b-form-group>
             </b-col>
             <b-col>
               <b-form-group id="BrandName" label="Brand: " label-for="productVersion.brand">
-                <b-form-input v-model="productModal.brand.brandName" disabled/>
+                <b-form-input v-model="productVersion.product.brand.brandName" disabled/>
               </b-form-group>
             </b-col>
-
           </b-row>
           <b-row>
-             <b-col>
+            <b-col>
               <b-form-group id="SupplierName" label="Supplier: " label-for="supplierName">
                 <b-input-group>
                   <b-form-select v-model="productVersion.supplierId" :options="suppliers"></b-form-select>
-                  <b-button variant="outline-secondary" v-b-tooltip.hover title="Add">
+                  <b-button
+                    variant="outline-secondary"
+                    v-b-tooltip.hover
+                    title="Add"
+                    @click="CreateSupplier"
+                  >
                     <font-awesome-icon icon="plus"/>
                   </b-button>
                 </b-input-group>
@@ -77,13 +81,20 @@
               </b-form-group>
             </b-col>
           </b-row>
+          <b-row v-if="isAddSupplier">
+            <b-col>
+              <b-jumbotron header="Add Supplier">
+                <AddSupplier v-on:updateSupplierModal="updateSupplierModal"/>
+              </b-jumbotron>
+            </b-col>
+          </b-row>
           <b-row>
             <b-col>
               <b-form-group id="latestPrice" label="Price: " label-for="latestPrice">
                 <b-form-input
                   id="latestPrice"
                   type="number"
-                  v-model="productVersion.latestPrice"
+                  v-model="productVersion.price"
                   required
                   placeholder="Enter price"
                   min="0"
@@ -94,7 +105,12 @@
               <b-form-group id="MetricName" label="Metric: " label-for="metricName">
                 <b-input-group>
                   <b-form-select v-model="productVersion.metricId" :options="metrics"></b-form-select>
-                  <b-button variant="outline-secondary" v-b-tooltip.hover title="Add">
+                  <b-button
+                    variant="outline-secondary"
+                    v-b-tooltip.hover
+                    title="Add"
+                    @click="CreateMetric"
+                  >
                     <font-awesome-icon icon="plus"/>
                   </b-button>
                 </b-input-group>
@@ -102,7 +118,7 @@
             </b-col>
             <b-col>
               <b-form-group id="DefaultMetricName" label="Default Metric: " label-for="metricName">
-                <b-form-select v-model="productVersion.defaultMetricId" :options="metrics"></b-form-select>
+                <b-form-select v-model="productVersion.product.metricId" :options="metrics"></b-form-select>
               </b-form-group>
             </b-col>
             <b-col>
@@ -115,6 +131,13 @@
                   min="0"
                 />
               </b-form-group>
+            </b-col>
+          </b-row>
+          <b-row v-if="isAddMetric">
+            <b-col>
+              <b-jumbotron header="Add Metric">
+                <AddMetric v-on:updateMetricModal="updateMetricModal"/>
+              </b-jumbotron>
             </b-col>
           </b-row>
           <b-row>
@@ -150,18 +173,26 @@
 <script>
 import MetricService from "@/api-services/metric.service";
 import SupplierService from "@/api-services/supplier.service";
-// import ProductVersionService from "@/api-services/productVersion.service";
+import ProductVersionService from "@/api-services/productVersion.service";
+import AddSupplier from "@/components/Supplier/AddEditComponent";
+import AddMetric from "@/components/Metric/AddEditComponent";
+import axios from "axios";
 export default {
+  components: {
+    AddSupplier,
+    AddMetric
+  },
   data() {
     return {
-      productVersion: {},
       metrics: [],
       defaultMetrics: [],
-      suppliers: []
+      suppliers: [],
+      isAddSupplier: false,
+      isAddMetric: false
     };
   },
   props: {
-    productModal: {}
+    productVersion: Object
   },
   mounted() {
     this.getAllSuppliers();
@@ -180,6 +211,11 @@ export default {
         return;
       }
       this.$nextTick(() => {
+        this.productVersion.productId = this.productVersion.product.id;
+        ProductVersionService.create(this.productVersion).then(response => {
+          this.$emit("updateProduct");
+          this.$router.push({ name: "products" });
+        });
         this.$refs.modal.hide();
       });
     },
@@ -188,26 +224,61 @@ export default {
       this.nameState = valid ? "valid" : "invalid";
       return valid;
     },
-    getAllSuppliers() {
-      SupplierService.getAll().then(response => {
-        response.data.forEach(element => {
-          this.suppliers.push({
-            value: element.id,
-            text: element.supplierName
+    async getAllSuppliers() {
+      // eslint-disable-next-line
+      axios.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${await this.$auth.getAccessToken()}`;
+      try {
+        SupplierService.getAll().then(response => {
+          this.suppliers = [];
+          response.data.forEach(element => {
+            this.suppliers.push({
+              value: element.id,
+              text: element.supplierName
+            });
           });
         });
-      });
+      } catch (e) {
+        this.$auth.loginRedirect();
+      }
     },
-    getAllMetrics() {
-      MetricService.getAll().then(response => {
-        response.data.forEach(element => {
-          this.metrics.push({ value: element.id, text: element.metricName });
-          this.defaultMetrics.push({
-            value: element.id,
-            text: element.metricName
+    async getAllMetrics() {
+      // eslint-disable-next-line
+      axios.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${await this.$auth.getAccessToken()}`;
+      try {
+        MetricService.getAll().then(response => {
+          this.metrics = [];
+          response.data.forEach(element => {
+            this.metrics.push({ value: element.id, text: element.metricName });
+            this.defaultMetrics.push({
+              value: element.id,
+              text: element.metricName
+            });
           });
         });
-      });
+      } catch (e) {
+        this.$auth.loginRedirect();
+      }
+    },
+    CreateSupplier() {
+      this.$store.commit("setAdress", {});
+      this.isAddSupplier = true;
+      this.$store.commit("setSupplierFromModal", true);
+    },
+    updateSupplierModal() {
+      this.isAddSupplier = false;
+      this.getAllSuppliers();
+    },
+    CreateMetric() {
+      this.isAddMetric = true;
+      this.$store.commit("setMetricFromModal", true);
+    },
+    updateMetricModal() {
+      this.isAddMetric = false;
+      this.getAllMetrics();
     }
   }
 };
