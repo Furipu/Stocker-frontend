@@ -68,7 +68,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["adress"])
+    ...mapGetters(["adress", "IsBrandFromModal"])
   },
   created() {
     if (this.$route.params.id !== undefined) {
@@ -82,7 +82,11 @@ export default {
       this.brand.adress = this.adress;
       if (this.brand.id === null || this.brand.id === undefined) {
         BrandService.create(this.brand).then(response => {
-          this.$router.push({ name: "brands" });
+          if (this.IsBrandFromModal) {
+            this.$emit("updateBrandModal");
+          } else {
+            this.$router.push({ name: "brands" });
+          }
         });
       } else {
         BrandService.update(this.$route.params.id, this.brand).then(
@@ -94,7 +98,11 @@ export default {
     },
     Cancel(evt) {
       evt.preventDefault();
-      this.$router.push({ name: "brands" });
+      if (this.IsBrandFromModal) {
+        this.$emit("updateBrandModal");
+      } else {
+        this.$router.push({ name: "brands" });
+      }
     }
   }
 };

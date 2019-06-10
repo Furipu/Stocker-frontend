@@ -61,7 +61,11 @@ export default {
     },
     Cancel(evt) {
       evt.preventDefault();
-      this.$router.push({ name: "metrics" });
+      if (this.IsMetricFromModal) {
+        this.$emit("updateMetricModal");
+      } else {
+        this.$router.push({ name: "metrics" });
+      }
     }
   }
 };

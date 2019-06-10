@@ -6,7 +6,7 @@
 
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav>
-        <b-nav-item @click="setProductState()" to="products">Product</b-nav-item>
+        <b-nav-item @click="setProductState()" to="/products">Product</b-nav-item>
 
         <b-nav-item-dropdown>
           <template slot="button-content">
@@ -21,6 +21,11 @@
           <b-dropdown-item to="/postCities">Postalcode and cities</b-dropdown-item>
           <b-dropdown-item to="/countries">Countries</b-dropdown-item>
           <b-dropdown-item to="/metrics">Metrics</b-dropdown-item>
+        </b-nav-item-dropdown>
+        <b-nav-item-dropdown v-if="isAdmin">
+          <template slot="button-content">
+            <em>Admin</em>
+          </template>
           <b-dropdown-item to="/users">Users</b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
@@ -40,17 +45,23 @@
   </b-navbar>
 </template>
 <script>
+import UserService from "@/api-services/user.service";
+import axios from "axios";
 import ProductState from "@/common/constants";
 export default {
   props: ["loggedUser"],
   name: "Navbar",
   data: function() {
     return {
-      authenticated: false
+      authenticated: false,
+      user: {},
+      roles: [],
+      isAdmin: false
     };
   },
-  created() {
+  async created() {
     this.isAuthenticated();
+    // this.getUser();
   },
   watch: {
     // Everytime the route changes, check for auth status
@@ -59,6 +70,22 @@ export default {
   methods: {
     async isAuthenticated() {
       this.authenticated = await this.$auth.isAuthenticated();
+      this.user = await this.$auth.getUser();
+      this.getUser();
+    },
+    async getUser() {
+      // eslint-disable-next-line
+      axios.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${await this.$auth.getAccessToken()}`;
+      try {
+        UserService.get(this.user.sub).then(response => {
+          this.roles = response.data.roles;
+          this.isAdmin = this.roles.includes("Admin");
+        });
+      } catch (e) {
+        this.$auth.loginRedirect();
+      }
     },
     login() {
       this.$auth.loginRedirect("/");
@@ -66,13 +93,10 @@ export default {
     async logout() {
       await this.$auth.logout();
       await this.isAuthenticated();
-
-      // Navigate back to home
-      this.$router.push({ path: "/" });
+      this.$auth.loginRedirect();
     },
     setProductState() {
       this.$store.commit("setProductState", ProductState.DEFAULT);
-      this.$root.$emit("bv::refresh::table", "productTable");
     }
   }
 };

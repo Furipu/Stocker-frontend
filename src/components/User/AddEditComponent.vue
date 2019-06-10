@@ -54,6 +54,21 @@
             </b-form-group>
           </b-col>
         </b-row>
+        <b-row>
+          <b-col>
+            <b-form-group id="roles" label="Roles: " label-for="roles">
+              <b-card>
+                <b-form-checkbox-group
+                  id="roles"
+                  stacked
+                  v-model="user.roles"
+                  :options="roles"
+                  name="roles"
+                ></b-form-checkbox-group>
+              </b-card>
+            </b-form-group>
+          </b-col>
+        </b-row>
         <b-button type="submit" variant="primary">Save</b-button>
         <b-button type="button" @click="Cancel">Cancel</b-button>
       </b-container>
@@ -66,13 +81,17 @@ import UserService from "@/api-services/user.service";
 export default {
   data() {
     return {
-      user: {}
+      user: {},
+      roles: []
     };
   },
-  created() {
+  async created() {
     if (this.$route.params.id !== undefined) {
-      UserService.get(this.$route.params.id).then(response => {
+      await UserService.get(this.$route.params.id).then(response => {
         this.user = response.data;
+        UserService.getAllRoles().then(response => {
+          this.roles = response.data;
+        });
       });
     }
   },

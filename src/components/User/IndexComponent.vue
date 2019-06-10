@@ -17,20 +17,21 @@
       </b-col>
     </b-row>
 
-    <b-table
-      id="userTalbe"
-      :items="users"
-      :fields="fields"
-      responsive
-      flex
-      :busy="isBusy"
-      :filter="filter"
-    >
+    <b-table id="userTalbe" :items="users" :fields="fields" flex :busy="isBusy" :filter="filter">
+      <!------------------------ details ------------------------->
+      <template slot="show_roles" slot-scope="row">
+        <b-button
+          size="sm"
+          @click="row.toggleDetails"
+          class="mr-2"
+        >{{ row.detailsShowing ? 'Hide' : 'Show'}} Roles</b-button>
+      </template>
       <!------------------------ busy ------------------------->
       <div slot="table-busy" class="text-center text-danger my-2">
         <b-spinner class="align-middle"/>
         <strong>Loading...</strong>
       </div>
+
       <!------------------------ delete ------------------------->
       <template slot="delete" slot-scope="row">
         <b-button
@@ -53,6 +54,11 @@
         </router-link>
       </template>
       <!----------------------------------------------------->
+      <template slot="row-details" slot-scope="row">
+        <b-list-group>
+          <b-list-group-item v-for="role in row.item.roles" v-bind:key="role.id">{{ role }}</b-list-group-item>
+        </b-list-group>
+      </template>
     </b-table>
     <div
       class="modal fade"
@@ -90,6 +96,7 @@
 
 <script>
 import UserService from "@/api-services/user.service";
+import axios from "axios";
 export default {
   data() {
     return {
@@ -100,6 +107,7 @@ export default {
         { key: "firstName", label: "First Name", sortable: true },
         { key: "lastName", label: "Last Name", sortable: true },
         { key: "email", label: "Email", sortable: true },
+        { key: "show_roles", label: "" },
         { key: "delete", label: "", class: "columnButton" },
         { key: "edit", label: "", class: "columnButton" }
       ]
@@ -112,16 +120,19 @@ export default {
     this.toggleBusy();
   },
   methods: {
-    getUsers() {
-      UserService.getAll()
-        .then(response => {
+    async getUsers() {
+      // eslint-disable-next-line
+      axios.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${await this.$auth.getAccessToken()}`;
+      try {
+        UserService.getAll().then(response => {
           this.users = response.data;
           this.toggleBusy();
-        })
-        .catch(function(error) {
-          this.toggleBusy();
-          console.log(error.response.data);
         });
+      } catch (e) {
+        this.$auth.loginRedirect();
+      }
     },
     CreateUser() {
       this.$router.push({ name: "user/create" });
@@ -130,6 +141,9 @@ export default {
       // Trigger pagination to update the number of buttons/pages due to filtering
       this.totalRows = filteredItems.length;
       this.currentPage = 1;
+    },
+    expandAdditionalInfo(row) {
+      row._showDetails = !row._showDetails;
     },
     Delete(id) {
       this.toggleBusy();

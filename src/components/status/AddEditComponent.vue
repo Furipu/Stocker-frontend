@@ -24,6 +24,7 @@
 
 <script>
 import StatusService from "@/api-services/status.service";
+import { mapGetters } from "vuex";
 export default {
   data() {
     return {
@@ -37,11 +38,18 @@ export default {
       });
     }
   },
+  computed: {
+    ...mapGetters(["IsStatusFromModal"])
+  },
   methods: {
     updateStatus() {
       if (this.status.id === undefined || this.status.id === null) {
         StatusService.create(this.status).then(response => {
-          this.$router.push({ name: "statuses" });
+          if (this.IsStatusFromModal) {
+            this.$emit("updateStatusModal");
+          } else {
+            this.$router.push({ name: "statuses" });
+          }
         });
       } else {
         StatusService.update(this.$route.params.id, this.status).then(
@@ -53,7 +61,11 @@ export default {
     },
     Cancel(evt) {
       evt.preventDefault();
-      this.$router.push({ name: "statuses" });
+      if (this.IsStatusFromModal) {
+        this.$emit("updateStatusModal");
+      } else {
+        this.$router.push({ name: "statuses" });
+      }
     }
   }
 };

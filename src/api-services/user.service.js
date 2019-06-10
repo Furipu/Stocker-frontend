@@ -21,5 +21,10 @@ export default {
 
   delete(id) {
     return Axios.delete(`${RESOURCE_NAME}/${id}`)
+  },
+
+  getAllRoles() {
+    return Axios.get(`${RESOURCE_NAME}/GetAllRoles`)
   }
+
 }

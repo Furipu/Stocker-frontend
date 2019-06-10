@@ -111,7 +111,7 @@ export default {
     return {
       locations: [],
       search: null,
-      caseSensitive: false,
+      caseSensitive: true,
       dialog: false,
       dialogDelete: false,
       location: {},
@@ -150,6 +150,7 @@ export default {
       this.dialog = false;
       this.dialogDelete = false;
       this.$refs.form.reset();
+      this.$emit("getAllLocations");
     },
     Add() {
       LocationService.create(this.location).then(response => {

@@ -24,11 +24,15 @@
 
 <script>
 import QualityService from "@/api-services/quality.service";
+import { mapGetters } from "vuex";
 export default {
   data() {
     return {
       quality: {}
     };
+  },
+  computed: {
+    ...mapGetters(["IsQualityFromModal"])
   },
   created() {
     if (this.$route.params.id !== undefined) {
@@ -41,7 +45,11 @@ export default {
     updateQuality() {
       if (this.quality.id === undefined || this.quality.id === null) {
         QualityService.create(this.quality).then(response => {
-          this.$router.push({ name: "qualities" });
+          if (this.IsQualityFromModal) {
+            this.$emit("updateQualityModal");
+          } else {
+            this.$router.push({ name: "qualities" });
+          }
         });
       } else {
         QualityService.update(this.$route.params.id, this.quality).then(
@@ -53,7 +61,11 @@ export default {
     },
     Cancel(evt) {
       evt.preventDefault();
-      this.$router.push({ name: "qualities" });
+      if (this.IsQualityFromModal) {
+        this.$emit("updateQualityModal");
+      } else {
+        this.$router.push({ name: "qualities" });
+      }
     }
   }
 };

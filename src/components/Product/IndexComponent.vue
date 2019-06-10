@@ -141,6 +141,7 @@ export default {
       productId: 0,
       fields: [
         { key: "productName", label: "Product", sortable: true },
+        { key: "category.categoryName", label: "Category", sortable: true },
         { key: "quantityInStock", label: "Stock", sortable: false },
         {
           key: "latestePricePerUnit",

@@ -19,47 +19,80 @@
           <b-col>
             <b-form-group id="category.categoryId" label="Category: " label-for="category">
               <b-input-group>
-                <treeselect
-                  v-model="product.categoryId"
-                  :options="categories"
-                  :normalizer="normalizer"
-                  :disable-branch-nodes="true"
-                />
-                 <b-button variant="outline-dark" v-b-tooltip.hover title="Add">
-                  <font-awesome-icon icon="plus"/>
-                </b-button>
+                <b-row no-gutters>
+                  <b-col>
+                    <treeselect
+                      v-model="product.categoryId"
+                      :options="categories"
+                      :normalizer="normalizer"
+                      :disable-branch-nodes="true"
+                    />
+                  </b-col>
+                  <b-col cols="1">
+                    <b-button
+                      variant="outline-secondary"
+                      v-b-tooltip.hover
+                      title="Add"
+                      v-b-modal.modalAdd
+                      @click="showModalCategory"
+                    >
+                      <font-awesome-icon icon="plus"/>
+                    </b-button>
+                  </b-col>
+                </b-row>
               </b-input-group>
             </b-form-group>
           </b-col>
+          <b-col>
+            <b-form-group id="locationName" label="Location: " label-for="product.location">
+              <b-row no-gutters>
+                <b-col>
+                  <treeselect
+                    v-model="product.locationId"
+                    :options="locations"
+                    :normalizer="normalizerLocation"
+                    :disable-branch-nodes="true"
+                  />
+                </b-col>
+                <b-col cols="1">
+                  <b-button
+                    variant="outline-secondary"
+                    v-b-tooltip.hover
+                    title="Add"
+                    v-b-modal.modalAdd
+                    @click="showModalLocation"
+                  >
+                    <font-awesome-icon icon="plus"/>
+                  </b-button>
+                </b-col>
+              </b-row>
+            </b-form-group>
+          </b-col>
+        </b-row>
+        <b-row>
           <b-col>
             <b-form-group id="quantity" label="Quantity: " label-for="quantityBought">
               <b-form-input
                 id="quantityBought"
                 type="number"
-                v-model="product.quantityInStock"
+                v-model="productVersion.quantityInStock"
                 required
                 placeholder="Enter quantity"
                 min="0"
               />
             </b-form-group>
           </b-col>
-        </b-row>
-        <b-row>
-          <b-col>
-            <b-form-group id="locationName" label="Location: " label-for="product.location">
-              <treeselect
-                v-model="product.locationId"
-                :options="locations"
-                :normalizer="normalizerLocation"
-                :disable-branch-nodes="true"
-              />
-            </b-form-group>
-          </b-col>
+
           <b-col>
             <b-form-group id="BrandName" label="Brand: " label-for="product.brand">
               <b-input-group>
                 <b-form-select v-model="product.brandId" :options="brands"></b-form-select>
-                <b-button variant="outline-secondary" v-b-tooltip.hover title="Add">
+                <b-button
+                  @click="createBrand"
+                  variant="outline-secondary"
+                  v-b-tooltip.hover
+                  title="Add"
+                >
                   <font-awesome-icon icon="plus"/>
                 </b-button>
               </b-input-group>
@@ -69,11 +102,30 @@
             <b-form-group id="SupplierName" label="Supplier: " label-for="supplierName">
               <b-input-group>
                 <b-form-select v-model="productVersion.supplierId" :options="suppliers"></b-form-select>
-                <b-button variant="outline-secondary" v-b-tooltip.hover title="Add">
+                <b-button
+                  variant="outline-secondary"
+                  v-b-tooltip.hover
+                  title="Add"
+                  @click="createSupplier"
+                >
                   <font-awesome-icon icon="plus"/>
                 </b-button>
               </b-input-group>
             </b-form-group>
+          </b-col>
+        </b-row>
+        <b-row v-if="isAddBrand">
+          <b-col>
+            <b-jumbotron header="Add Brand">
+              <AddBrand v-on:updateBrandModal="updateBrandModal"/>
+            </b-jumbotron>
+          </b-col>
+        </b-row>
+        <b-row v-if="isAddSupplier">
+          <b-col>
+            <b-jumbotron header="Add Supplier">
+              <AddSupplier v-on:updateSupplierModal="updateSupplierModal"/>
+            </b-jumbotron>
           </b-col>
         </b-row>
         <b-row>
@@ -82,6 +134,7 @@
               <b-input-group>
                 <b-form-select v-model="product.statusId" :options="statuses"></b-form-select>
                 <b-button
+                  @click="createStatus"
                   variant="outline-secondary"
                   v-b-tooltip.hover
                   title="Add"
@@ -95,11 +148,30 @@
             <b-form-group id="QualityName" label="Quality: " label-for="qualityName">
               <b-input-group>
                 <b-form-select v-model="product.qualityId" :options="qualities"></b-form-select>
-                <b-button variant="outline-secondary" v-b-tooltip.hover title="Add">
+                <b-button
+                  @click="createQuality"
+                  variant="outline-secondary"
+                  v-b-tooltip.hover
+                  title="Add"
+                >
                   <font-awesome-icon icon="plus"/>
                 </b-button>
               </b-input-group>
             </b-form-group>
+          </b-col>
+        </b-row>
+        <b-row v-if="isAddStatus">
+          <b-col>
+            <b-jumbotron header="Add Status">
+              <AddStatus v-on:updateStatusModal="updateStatusModal"/>
+            </b-jumbotron>
+          </b-col>
+        </b-row>
+        <b-row v-if="isAddQuality">
+          <b-col>
+            <b-jumbotron header="Add Quality">
+              <AddQuality v-on:updateQualityModal="updateQualityModal"/>
+            </b-jumbotron>
           </b-col>
         </b-row>
         <b-row>
@@ -119,7 +191,12 @@
             <b-form-group id="MetricName" label="Metric: " label-for="metricName">
               <b-input-group>
                 <b-form-select v-model="product.metricId" :options="metrics"></b-form-select>
-                <b-button variant="outline-secondary" v-b-tooltip.hover title="Add">
+                <b-button
+                  variant="outline-secondary"
+                  v-b-tooltip.hover
+                  title="Add"
+                  @click="createMetric"
+                >
                   <font-awesome-icon icon="plus"/>
                 </b-button>
               </b-input-group>
@@ -140,6 +217,13 @@
                 min="0"
               />
             </b-form-group>
+          </b-col>
+        </b-row>
+        <b-row v-if="isAddMetric">
+          <b-col>
+            <b-jumbotron header="Add Metric">
+              <AddMetric v-on:updateMetricModal="updateMetricModal"/>
+            </b-jumbotron>
           </b-col>
         </b-row>
         <b-row>
@@ -166,6 +250,10 @@
         <b-button type="button" @click="Cancel">Cancel</b-button>
       </b-container>
     </b-form>
+    <b-modal size="xl" id="modalAdd" title="Add" ref="modal">
+      <AddCategory v-if="isAddCategory" v-on:getAllCategories="getAllCategories"/>
+      <AddLocation v-if="isAddLocation" v-on:getAllLocations="getAllLocations"/>
+    </b-modal>
   </div>
 </template>
 
@@ -180,9 +268,25 @@ import BrandService from "@/api-services/brand.service";
 import SupplierService from "@/api-services/supplier.service";
 import ProductVersionService from "@/api-services/productVersion.service";
 import Treeselect from "@riophae/vue-treeselect";
+import AddSupplier from "@/components/Supplier/AddEditComponent";
+import AddMetric from "@/components/Metric/AddEditComponent";
+import AddBrand from "@/components/Brand/AddEditComponent";
+import AddStatus from "@/components/Status/AddEditComponent";
+import AddQuality from "@/components/Quality/AddEditComponent";
+import AddCategory from "@/components/Category/IndexComponent";
+import AddLocation from "@/components/Location/IndexComponent";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 export default {
-  components: { Treeselect },
+  components: {
+    Treeselect,
+    AddSupplier,
+    AddMetric,
+    AddBrand,
+    AddStatus,
+    AddQuality,
+    AddCategory,
+    AddLocation
+  },
   data() {
     return {
       product: {},
@@ -209,7 +313,14 @@ export default {
       qualities: [],
       metrics: [],
       defaultMetrics: [],
-      locations: []
+      locations: [],
+      isAddSupplier: false,
+      isAddMetric: false,
+      isAddBrand: false,
+      isAddStatus: false,
+      isAddQuality: false,
+      isAddCategory: false,
+      isAddLocation: false
     };
   },
   created() {
@@ -218,19 +329,24 @@ export default {
         this.product = response.data;
       });
     }
-    this.getallCategories();
+    this.getAllCategories();
     this.getAllLocations();
     this.getAllStatuses();
     this.getAllBrands();
     this.getAllSuppliers();
     this.getAllQualities();
     this.getAllMetrics();
+
+    this.$root.$on("bv::modal::hide", (bvEvent, modalId) => {
+      if (bvEvent.type === "hide") {
+        this.isAddCategory = false;
+        this.isAddLocation = false;
+      }
+    });
   },
   methods: {
     updateProduct() {
       if (this.product.id === undefined || this.product.id === null) {
-        this.productVersion.quantityInStock = this.product.quantityInStock;
-        this.productVersion.quantityPurchased = this.product.quantityInStock;
         this.productVersion.price = this.product.latestPrice;
         this.productVersion.pricePerUnit = this.product.latestPricePerUnit;
         ProductService.create(this.product).then(response => {
@@ -252,7 +368,8 @@ export default {
       evt.preventDefault();
       this.$router.push({ name: "products" });
     },
-    getallCategories() {
+    getAllCategories() {
+      this.$bvModal.hide(this.modalAdd);
       CategoryService.getAll().then(response => {
         this.CleanChildrenFromList(response.data);
         this.categories = response.data;
@@ -268,6 +385,7 @@ export default {
       });
     },
     getAllStatuses() {
+      this.statuses = [];
       StatusService.getAll().then(response => {
         response.data.forEach(element => {
           this.statuses.push({ value: element.id, text: element.statusName });
@@ -275,6 +393,7 @@ export default {
       });
     },
     getAllBrands() {
+      this.brands = [];
       BrandService.getAll().then(response => {
         response.data.forEach(element => {
           this.brands.push({ value: element.id, text: element.brandName });
@@ -282,6 +401,7 @@ export default {
       });
     },
     getAllSuppliers() {
+      this.suppliers = [];
       SupplierService.getAll().then(response => {
         response.data.forEach(element => {
           this.suppliers.push({
@@ -292,6 +412,7 @@ export default {
       });
     },
     getAllQualities() {
+      this.qualities = [];
       QualityService.getAll().then(response => {
         response.data.forEach(element => {
           this.qualities.push({ value: element.id, text: element.qualityName });
@@ -299,6 +420,7 @@ export default {
       });
     },
     getAllMetrics() {
+      this.metrics = [];
       MetricService.getAll().then(response => {
         response.data.forEach(element => {
           this.metrics.push({ value: element.id, text: element.metricName });
@@ -310,10 +432,58 @@ export default {
       });
     },
     getAllLocations() {
+      this.$bvModal.hide(this.modalAdd);
       LocationService.getAll().then(response => {
         this.CleanChildrenFromList(response.data);
         this.locations = response.data;
       });
+    },
+    createSupplier() {
+      this.$store.commit("setAdress", {});
+      this.isAddSupplier = true;
+      this.$store.commit("setSupplierFromModal", true);
+    },
+    updateSupplierModal() {
+      this.isAddSupplier = false;
+      this.getAllSuppliers();
+    },
+    createMetric() {
+      this.isAddMetric = true;
+      this.$store.commit("setMetricFromModal", true);
+    },
+    updateMetricModal() {
+      this.isAddMetric = false;
+      this.getAllMetrics();
+    },
+    createBrand() {
+      this.isAddBrand = true;
+      this.$store.commit("SetBrandFromModal", true);
+    },
+    updateBrandModal() {
+      this.isAddBrand = false;
+      this.getAllBrands();
+    },
+    createStatus() {
+      this.isAddStatus = true;
+      this.$store.commit("SetStatusFromModal", true);
+    },
+    updateStatusModal() {
+      this.isAddStatus = false;
+      this.getAllStatuses();
+    },
+    createQuality() {
+      this.isAddQuality = true;
+      this.$store.commit("SetQualityFromModal", true);
+    },
+    updateQualityModal() {
+      this.isAddQuality = false;
+      this.getAllQualities();
+    },
+    showModalCategory() {
+      this.isAddCategory = true;
+    },
+    showModalLocation() {
+      this.isAddLocation = true;
     }
   }
 };

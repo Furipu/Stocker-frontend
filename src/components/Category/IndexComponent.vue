@@ -111,7 +111,6 @@ export default {
     return {
       categories: [],
       search: null,
-      caseSensitive: false,
       dialog: false,
       dialogDelete: false,
       category: {},
@@ -125,9 +124,7 @@ export default {
   },
   computed: {
     filter() {
-      return this.caseSensitive
-        ? (item, search, textKey) => item[textKey].indexOf(search) > -1
-        : undefined;
+      return (item, search, textKey) => item[textKey].indexOf(search) > -1;
     }
   },
   methods: {
@@ -150,6 +147,7 @@ export default {
       this.dialog = false;
       this.dialogDelete = false;
       this.$refs.form.reset();
+      this.$emit("getAllCategories");
     },
     Add() {
       CategoryService.create(this.category).then(response => {
@@ -175,13 +173,24 @@ export default {
       this.dialogDelete = true;
     },
     Delete() {
-      CategoryService.delete(this.category.id).then(response => {
-        this.getCategories();
-        this.ResetCategory();
-      });
+      CategoryService.delete(this.category.id)
+        .then(response => {
+          this.getCategories();
+          this.ResetCategory();
+        })
+        .catch(error => {
+          this.makeToastError(error);
+        });
     },
     Cancel() {
       this.ResetCategory();
+    },
+    makeToastError(error) {
+      this.$bvToast.toast(`Er is een fout opgetreden :  ${error}`, {
+        title: "Error",
+        autoHideDelay: 3000,
+        appendToast: true
+      });
     }
   }
 };
